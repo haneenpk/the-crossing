@@ -1,0 +1,175 @@
+@import "tailwindcss";
+
+/* ------------------------------------------------------------------ */
+/*  THE CROSSING — design tokens                                       */
+/* ------------------------------------------------------------------ */
+
+:root {
+  --void: #050505;
+  --navy: #08111e;
+  --ivory: #e8eaed;
+  --silver: #8a94a6;
+  --ember: #d98e5f;
+}
+
+@theme inline {
+  --color-void: var(--void);
+  --color-navy: var(--navy);
+  --color-ivory: var(--ivory);
+  --color-silver: var(--silver);
+  --color-ember: var(--ember);
+  --font-sans: var(--font-inter), system-ui, sans-serif;
+  --font-display: var(--font-instrument), Georgia, serif;
+  --font-mono: var(--font-plex-mono), monospace;
+}
+
+html {
+  background: var(--void);
+  scrollbar-color: rgba(138, 148, 166, 0.35) transparent;
+}
+
+body {
+  background: var(--void);
+  color: var(--ivory);
+  font-family: var(--font-sans);
+  overflow-x: clip;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: rgba(217, 142, 95, 0.35);
+  color: var(--ivory);
+}
+
+:focus-visible {
+  outline: 1px solid rgba(232, 234, 237, 0.7);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* ------------------------------------------------------------------ */
+/*  Typography helpers                                                 */
+/* ------------------------------------------------------------------ */
+
+.telemetry {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--silver);
+}
+
+.telemetry.bright {
+  color: rgba(232, 234, 237, 0.92);
+  transition: color 0.3s ease;
+}
+
+a.telemetry.bright:hover {
+  color: #ffffff;
+}
+
+/* ------------------------------------------------------------------ */
+/*  Liquid glass — used in exactly four places                        */
+/* ------------------------------------------------------------------ */
+
+.glass {
+  position: relative;
+  isolation: isolate;
+  background: rgba(255, 255, 255, 0.05);
+  -webkit-backdrop-filter: blur(20px) saturate(1.15);
+  backdrop-filter: blur(20px) saturate(1.15);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow:
+    0 24px 48px -16px rgba(0, 0, 0, 0.6),
+    0 4px 12px -4px rgba(0, 0, 0, 0.4);
+}
+
+.glass::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.1),
+    rgba(255, 255, 255, 0) 38%
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Starfield — pure CSS, two drifting tiled layers                    */
+/* ------------------------------------------------------------------ */
+
+.stars-near,
+.stars-far {
+  position: absolute;
+  inset: -220px;
+  pointer-events: none;
+  background-repeat: repeat;
+}
+
+.stars-far {
+  background-image:
+    radial-gradient(1px 1px at 22px 46px, rgba(232, 234, 237, 0.55), transparent 100%),
+    radial-gradient(1px 1px at 168px 130px, rgba(232, 234, 237, 0.4), transparent 100%),
+    radial-gradient(1px 1px at 310px 82px, rgba(178, 195, 219, 0.45), transparent 100%),
+    radial-gradient(1px 1px at 421px 274px, rgba(232, 234, 237, 0.35), transparent 100%),
+    radial-gradient(1px 1px at 96px 356px, rgba(232, 234, 237, 0.5), transparent 100%),
+    radial-gradient(1px 1px at 512px 189px, rgba(178, 195, 219, 0.3), transparent 100%),
+    radial-gradient(1px 1px at 258px 441px, rgba(232, 234, 237, 0.42), transparent 100%),
+    radial-gradient(1px 1px at 460px 490px, rgba(232, 234, 237, 0.28), transparent 100%);
+  background-size: 560px 560px;
+  animation: star-drift 340s linear infinite;
+}
+
+.stars-near {
+  background-image:
+    radial-gradient(1.4px 1.4px at 74px 210px, rgba(232, 234, 237, 0.75), transparent 100%),
+    radial-gradient(1.3px 1.3px at 340px 66px, rgba(210, 222, 238, 0.6), transparent 100%),
+    radial-gradient(1.5px 1.5px at 590px 388px, rgba(232, 234, 237, 0.65), transparent 100%),
+    radial-gradient(1.2px 1.2px at 178px 512px, rgba(232, 234, 237, 0.5), transparent 100%),
+    radial-gradient(1.4px 1.4px at 470px 620px, rgba(210, 222, 238, 0.55), transparent 100%);
+  background-size: 760px 760px;
+  animation: star-drift 220s linear infinite;
+}
+
+@keyframes star-drift {
+  to {
+    transform: translate3d(220px, 160px, 0);
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/*  Film grain — one fixed overlay, barely there                       */
+/* ------------------------------------------------------------------ */
+
+.grain {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 160px 160px;
+}
+
+/* ------------------------------------------------------------------ */
+/*  Reduced motion                                                     */
+/* ------------------------------------------------------------------ */
+
+@media (prefers-reduced-motion: reduce) {
+  .stars-near,
+  .stars-far {
+    animation: none;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
