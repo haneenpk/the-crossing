@@ -6,7 +6,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { motion } from "framer-motion";
 import { DUR, EASE } from "@/lib/motion";
-import { useMediaQuery, useMounted } from "@/lib/hooks";
+import { useMediaQuery, useMounted, useTouchVideoUnlock } from "@/lib/hooks";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
@@ -33,6 +33,7 @@ export default function Hero() {
   const reduced = useMediaQuery("(prefers-reduced-motion: reduce)");
   const isMobile = useMediaQuery("(max-width: 768px)");
   const src = isMobile ? "/media/hero-960.mp4" : "/media/hero-1600.mp4";
+  useTouchVideoUnlock(videoRef);
 
   useEffect(() => {
     if (reduced || !mounted) return;
@@ -86,7 +87,9 @@ export default function Hero() {
 
   return (
     <section id="hero" aria-label="The Crossing — opening scene">
-      <div ref={wrapRef} className={reduced ? "h-svh" : "h-[400svh]"}>
+      {/* Touch flicks cover ground fast — a shorter pin keeps the scrub
+          from feeling stuck on phones while desktop keeps the long take. */}
+      <div ref={wrapRef} className={reduced ? "h-svh" : "h-[320svh] md:h-[400svh]"}>
         <div className="sticky top-0 h-svh overflow-hidden">
           {/* Poster paints instantly; the film crossfades in over it. */}
           <Image

@@ -20,7 +20,7 @@ export default function Overview() {
       <div className="mx-auto w-full max-w-6xl px-6 py-40 sm:px-10">
         <SectionLabel index="01">The overview effect</SectionLabel>
 
-        <h2 className="mt-10 font-display text-[clamp(2.4rem,6vw,5.2rem)] leading-[1.08] tracking-tight text-ivory">
+        <h2 className="mt-10 font-display text-[clamp(1.9rem,6vw,5.2rem)] leading-[1.12] tracking-tight text-ivory sm:leading-[1.08]">
           <RevealLines
             lines={[
               <>From here, there are no borders.</>,

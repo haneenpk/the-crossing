@@ -8,7 +8,7 @@ import {
   useScroll,
   useTransform,
 } from "framer-motion";
-import { useMediaQuery, useMounted } from "@/lib/hooks";
+import { useMediaQuery, useMounted, useTouchVideoUnlock } from "@/lib/hooks";
 
 /** The dawn completes over this fraction of the passage; beyond it the
  *  lit Moon simply holds. Scrolling back rewinds the sunrise. */
@@ -29,6 +29,7 @@ export default function MoonPassage({ children }: { children: ReactNode }) {
 
   const mounted = useMounted();
   const reduced = useMediaQuery("(prefers-reduced-motion: reduce)");
+  useTouchVideoUnlock(videoRef);
 
   const { scrollYProgress } = useScroll({
     target: wrapRef,

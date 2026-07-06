@@ -1,6 +1,11 @@
 "use client";
 
-import { useCallback, useSyncExternalStore } from "react";
+import {
+  useCallback,
+  useEffect,
+  useSyncExternalStore,
+  type RefObject,
+} from "react";
 
 /**
  * Hydration-safe media query: renders the server fallback first,
@@ -31,4 +36,24 @@ export function useMounted(): boolean {
     () => true,
     () => false,
   );
+}
+
+/**
+ * iOS Safari won't decode a muted video for currentTime seeking until a
+ * user gesture has "touched" it. On the first touch anywhere, play+pause
+ * the video once to unlock scrubbing. No-op on non-touch devices.
+ */
+export function useTouchVideoUnlock(ref: RefObject<HTMLVideoElement | null>) {
+  useEffect(() => {
+    const unlock = () => {
+      const video = ref.current;
+      if (!video) return;
+      video
+        .play()
+        .then(() => video.pause())
+        .catch(() => {});
+    };
+    window.addEventListener("touchstart", unlock, { once: true, passive: true });
+    return () => window.removeEventListener("touchstart", unlock);
+  }, [ref]);
 }

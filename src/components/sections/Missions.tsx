@@ -1,10 +1,73 @@
 "use client";
 
-import { motion } from "framer-motion";
+import Image from "next/image";
+import { useRef } from "react";
+import { motion, useAnimationFrame, useScroll } from "framer-motion";
 import SectionLabel from "@/components/ui/SectionLabel";
 import RevealLines from "@/components/ui/RevealLines";
 import StatCounter from "@/components/ui/StatCounter";
 import { DUR, EASE, fade } from "@/lib/motion";
+import { useMediaQuery, useMounted, useTouchVideoUnlock } from "@/lib/hooks";
+
+/**
+ * The silver-fabric film, presented as a framed gallery object.
+ * Scroll owns its playhead 1:1, exactly like the hero and the moonrise:
+ * scrolling down flows the fabric forward, scrolling up reverses it,
+ * and it freezes the instant the page stops. Reduced motion gets the
+ * still. Never full-bleed — the frame flatters the source far more
+ * than fullscreen would.
+ */
+function FabricPanel() {
+  const ref = useRef<HTMLDivElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const mounted = useMounted();
+  const reduced = useMediaQuery("(prefers-reduced-motion: reduce)");
+  useTouchVideoUnlock(videoRef);
+
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ["start end", "end start"],
+  });
+
+  useAnimationFrame(() => {
+    const video = videoRef.current;
+    if (!video || video.readyState < 2 || !video.duration) return;
+    const target = scrollYProgress.get() * (video.duration - 0.05);
+    if (Math.abs(target - video.currentTime) > 0.01) {
+      video.currentTime = target;
+    }
+  });
+
+  return (
+    <motion.div
+      ref={ref}
+      {...fade(0.15)}
+      className="relative aspect-1920/1000 overflow-hidden rounded-2xl shadow-[0_40px_80px_-24px_rgba(0,0,0,0.8)]"
+    >
+      {reduced || !mounted ? (
+        <Image
+          src="/media/fabric-poster.jpg"
+          alt="A slow wave of liquid silver fabric — an abstraction of the invisible structure of the universe"
+          fill
+          sizes="(min-width: 1024px) 58vw, 100vw"
+          className="object-cover"
+        />
+      ) : (
+        <video
+          ref={videoRef}
+          src="/media/fabric.mp4"
+          muted
+          playsInline
+          preload="auto"
+          poster="/media/fabric-poster.jpg"
+          aria-label="A slow wave of liquid silver fabric — an abstraction of the invisible structure of the universe"
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+      )}
+      <div className="pointer-events-none absolute inset-0 rounded-2xl ring-1 ring-inset ring-white/10" />
+    </motion.div>
+  );
+}
 
 const MISSIONS = [
   {
@@ -99,6 +162,34 @@ export default function Missions() {
             </p>
           </motion.article>
         ))}
+      </div>
+
+      {/* Interlude — the part of the universe no mission can photograph.
+          Deliberately framed, never full-bleed: a bright object held in the void. */}
+      <div className="mt-36 grid items-center gap-12 lg:grid-cols-12">
+        <div className="lg:col-span-7">
+          <FabricPanel />
+          <motion.p {...fade(0.35)} className="telemetry mt-6">
+            Dark matter &amp; dark energy — 95% of everything, still unseen
+          </motion.p>
+        </div>
+        <div className="lg:col-span-5">
+          <h3 className="font-display text-[clamp(1.9rem,3.6vw,3rem)] leading-[1.12] tracking-tight text-ivory">
+            <RevealLines
+              lines={[<>Most of it,</>, <>we cannot <span className="italic">see.</span></>]}
+            />
+          </h3>
+          <motion.p
+            {...fade(0.25)}
+            className="mt-8 max-w-[38ch] text-[14px] leading-[1.75] text-ivory/60 sm:text-[15px]"
+          >
+            Everything every telescope has ever photographed — every star,
+            galaxy and world — is less than five percent of what exists. The
+            rest is dark matter and dark energy: an invisible fabric the
+            cosmos moves on, bending light around it, holding galaxies
+            together, pushing space apart.
+          </motion.p>
+        </div>
       </div>
 
       {/* The universe in numbers */}

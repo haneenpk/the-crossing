@@ -12,6 +12,7 @@ import {
 import SectionLabel from "@/components/ui/SectionLabel";
 import RevealLines from "@/components/ui/RevealLines";
 import { fade } from "@/lib/motion";
+import { useMediaQuery } from "@/lib/hooks";
 
 /**
  * Scene 03 — the walk.
@@ -32,7 +33,11 @@ export default function Moonwalk() {
   const tiltX = useSpring(useMotionValue(0), { stiffness: 60, damping: 18 });
   const tiltY = useSpring(useMotionValue(0), { stiffness: 60, damping: 18 });
 
+  // Pointer tilt is a hover-device luxury — on touch it just fights the thumb.
+  const canHover = useMediaQuery("(hover: hover)");
+
   const onPointerMove = (e: React.PointerEvent) => {
+    if (!canHover) return;
     const rect = frameRef.current?.getBoundingClientRect();
     if (!rect) return;
     tiltY.set(((e.clientX - rect.left) / rect.width - 0.5) * 2);
@@ -76,7 +81,7 @@ export default function Moonwalk() {
             onPointerLeave={onPointerLeave}
             style={{ rotateX: tiltX, rotateY: tiltY }}
             {...fade(0.15)}
-            className="relative aspect-[16/9] overflow-hidden rounded-2xl shadow-[0_40px_80px_-24px_rgba(0,0,0,0.8)]"
+            className="relative aspect-video overflow-hidden rounded-2xl shadow-[0_40px_80px_-24px_rgba(0,0,0,0.8)]"
           >
             <motion.div className="absolute inset-0 scale-[1.16]" style={{ y: imageY }}>
               <Image

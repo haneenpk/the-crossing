@@ -32,7 +32,7 @@ export default function RevealLines({
         // pb/-mb give descenders room inside the clip strip without shifting layout
         <span key={i} className="block overflow-hidden pb-[0.18em] mb-[-0.18em]">
           <motion.span
-            className={`block will-change-transform ${lineClassName}`}
+            className={`block text-balance will-change-transform ${lineClassName}`}
             initial={{ y: "130%" }}
             animate={inView ? { y: "0%" } : undefined}
             transition={{ duration: DUR.base, ease: EASE, delay: delay + i * 0.08 }}
