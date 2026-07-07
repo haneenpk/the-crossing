@@ -1,4 +1,4 @@
-# The Crossing — A Journey in Seven Scenes
+# The Crossing — A Journey in Eight Scenes
 
 An interactive cinematic website about space, distance and the way home.
 The visitor is the astronaut; the scroll is the mission. Scrolling the hero

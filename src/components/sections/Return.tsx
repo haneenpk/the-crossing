@@ -86,7 +86,7 @@ export default function Return() {
             ref={contentRef}
             className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center px-6 text-center opacity-0"
           >
-            <p className="telemetry">Scene 06 — The return</p>
+            <p className="telemetry">Scene 07 — The return</p>
             <h2 className="mt-8 max-w-4xl font-display text-[clamp(2.6rem,7vw,6rem)] leading-[1.04] tracking-tight text-ivory">
               Every journey out is a journey <span className="italic">back.</span>
             </h2>

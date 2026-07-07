@@ -26,12 +26,12 @@ const plexMono = IBM_Plex_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
-  title: "The Crossing — A Journey in Seven Scenes",
+  title: "The Crossing — A Journey in Eight Scenes",
   description:
     "An interactive cinematic experience about space, distance and the way home. Scroll to push through the hatch.",
   keywords: ["space", "astronomy", "universe", "cinematic", "interactive film"],
   openGraph: {
-    title: "The Crossing — A Journey in Seven Scenes",
+    title: "The Crossing — A Journey in Eight Scenes",
     description:
       "An interactive cinematic experience about space, distance and the way home.",
     type: "website",

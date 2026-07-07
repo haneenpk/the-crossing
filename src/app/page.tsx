@@ -7,6 +7,7 @@ import Overview from "@/components/sections/Overview";
 import Timeline from "@/components/sections/Timeline";
 import Moonwalk from "@/components/sections/Moonwalk";
 import Beyond from "@/components/sections/Beyond";
+import Traveler from "@/components/sections/Traveler";
 import Missions from "@/components/sections/Missions";
 import Return from "@/components/sections/Return";
 import Footer from "@/components/sections/Footer";
@@ -26,6 +27,7 @@ export default function Home() {
         </MoonPassage>
         <Moonwalk />
         <Beyond />
+        <Traveler />
         <Missions />
         <Return />
       </main>

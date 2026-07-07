@@ -4,7 +4,16 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { EASE } from "@/lib/motion";
 
-const SCENES = ["hero", "overview", "beginning", "moonwalk", "beyond", "missions", "return"];
+const SCENES = [
+  "hero",
+  "overview",
+  "beginning",
+  "moonwalk",
+  "beyond",
+  "traveler",
+  "missions",
+  "return",
+];
 
 /**
  * Quiet telemetry in the corner: `03 / 07`.

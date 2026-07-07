@@ -6,6 +6,7 @@ import { motion, useAnimationFrame, useScroll } from "framer-motion";
 import SectionLabel from "@/components/ui/SectionLabel";
 import RevealLines from "@/components/ui/RevealLines";
 import StatCounter from "@/components/ui/StatCounter";
+import CubeField from "@/components/ui/CubeField";
 import { DUR, EASE, fade } from "@/lib/motion";
 import { useMediaQuery, useMounted, useTouchVideoUnlock } from "@/lib/hooks";
 
@@ -129,7 +130,7 @@ export default function Missions() {
       aria-label="Future missions and the universe in numbers"
       className="relative mx-auto max-w-7xl px-6 py-40 sm:px-10 sm:py-56"
     >
-      <SectionLabel index="05">What comes next</SectionLabel>
+      <SectionLabel index="06">What comes next</SectionLabel>
 
       <h2 className="mt-10 font-display text-[clamp(2.4rem,6vw,5.2rem)] leading-[1.05] tracking-tight text-ivory">
         <RevealLines lines={[<>The next</>, <>giant <span className="italic">leaps.</span></>]} />
@@ -204,6 +205,20 @@ export default function Missions() {
           </motion.div>
         ))}
       </div>
+
+      {/* The grid — a quantized wall of spacetime that answers the cursor. */}
+      <motion.div
+        {...fade(0.2)}
+        className="relative left-1/2 mt-40 w-screen -translate-x-1/2"
+      >
+        {/* alpha mask dissolves the tiles into the void at both edges */}
+        <div className="relative h-[52svh] min-h-90 overflow-hidden [mask-image:linear-gradient(to_bottom,transparent,black_14%,black_86%,transparent)]">
+          <CubeField />
+        </div>
+        <p className="telemetry mt-6 px-6 text-center">
+          Spacetime, quantized — trace it and watch it answer
+        </p>
+      </motion.div>
     </section>
   );
 }

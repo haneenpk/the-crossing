@@ -130,7 +130,7 @@ export default function Hero() {
               animate={{ opacity: 1 }}
               transition={{ duration: DUR.slow, ease: EASE, delay: 0.4 }}
             >
-              A journey in seven scenes
+              A journey in eight scenes
             </motion.p>
             <h1 className="mt-6 font-display text-[clamp(3.5rem,12vw,9.5rem)] leading-[0.95] tracking-tight text-ivory">
               {/* pb/-mb keep the italic descenders inside the clip strip */}
