@@ -32,7 +32,7 @@ export default function Hero() {
   const mounted = useMounted();
   const reduced = useMediaQuery("(prefers-reduced-motion: reduce)");
   const isMobile = useMediaQuery("(max-width: 768px)");
-  const src = isMobile ? "/media/hero-960.mp4" : "/media/hero-1600.mp4";
+  const src = isMobile ? "/media/hero-1280.mp4" : "/media/hero-1920.mp4";
   useTouchVideoUnlock(videoRef);
 
   useEffect(() => {
@@ -46,12 +46,18 @@ export default function Hero() {
     // The film waits on its first frame — only scroll moves the camera.
     // It tracks the Lenis-smoothed scroll position 1:1 (no extra easing),
     // so the frame freezes the instant the page stops moving.
+    // Scrubbing is decode-bound: a seek landing mid-GOP makes the decoder
+    // replay every frame back to the previous keyframe. Two guards keep that
+    // work proportional to what the eye actually receives — never queue a
+    // second seek while one is still resolving (the scroll has already made
+    // it stale), and never pay for a move finer than the frame grid can show.
+    const FRAME = 1 / 24;
     const seek = () => {
       if (video.readyState < 2 || Number.isNaN(video.duration)) return;
+      if (video.seeking) return;
       const target = progress.value * (video.duration - 0.06);
-      if (Math.abs(target - video.currentTime) > 0.01) {
-        video.currentTime = target;
-      }
+      if (Math.abs(target - video.currentTime) < FRAME) return;
+      video.currentTime = target;
     };
     gsap.ticker.add(seek);
 
@@ -74,7 +80,10 @@ export default function Hero() {
           scrub: true,
         },
       });
-      tl.to(titleRef.current, { opacity: 0, y: -90, scale: 0.97, duration: 0.28 }, 0.02)
+      // The title holds for a beat before it starts to go, then dissolves over
+      // a third of the pin — long enough that it reads as the camera leaving
+      // the words behind rather than the words blinking out.
+      tl.to(titleRef.current, { opacity: 0, y: -90, scale: 0.97, duration: 0.34 }, 0.1)
         .to(cueRef.current, { opacity: 0, duration: 0.08 }, 0)
         .fromTo(fadeRef.current, { opacity: 0 }, { opacity: 1, duration: 0.16 }, 0.84);
     }, wrap);
@@ -94,9 +103,10 @@ export default function Hero() {
           {/* Poster paints instantly; the film crossfades in over it. */}
           <Image
             src="/media/hero-poster.jpg"
-            alt="An astronaut standing in the open hatch of a spacecraft, looking down at Earth glowing at night"
+            alt="An astronaut walking down a spacecraft corridor toward an open circular hatch, beyond it Earth glowing at night"
             fill
             priority
+            quality={92}
             sizes="100vw"
             className="object-cover"
           />
@@ -124,15 +134,24 @@ export default function Hero() {
             ref={titleRef}
             className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center"
           >
+            {/* The hatch frames Earth's terminator, so the brightest, busiest
+                part of the shot — the city lights — sits exactly behind the
+                words. This scrim rides inside the title block so it fades on
+                the same scrub the type does, never lingering as a grey patch
+                over the film once the words have gone. */}
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-0 [background:radial-gradient(56%_44%_at_50%_48%,rgba(3,5,11,0.46)_0%,rgba(3,5,11,0.26)_46%,rgba(3,5,11,0.08)_70%,transparent_84%)]"
+            />
             <motion.p
-              className="telemetry"
+              className="relative telemetry [text-shadow:0_1px_18px_rgba(3,5,11,0.9)]"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: DUR.slow, ease: EASE, delay: 0.4 }}
             >
               A journey in eight scenes
             </motion.p>
-            <h1 className="mt-6 font-display text-[clamp(3.5rem,12vw,9.5rem)] leading-[0.95] tracking-tight text-ivory">
+            <h1 className="relative mt-6 font-display text-[clamp(3.5rem,12vw,9.5rem)] leading-[0.95] tracking-tight text-ivory [text-shadow:0_2px_16px_rgba(3,5,11,0.6),0_4px_64px_rgba(3,5,11,0.5)]">
               {/* pb/-mb keep the italic descenders inside the clip strip */}
               <span className="block overflow-hidden pb-[0.18em] mb-[-0.18em]">
                 <motion.span
@@ -146,7 +165,7 @@ export default function Hero() {
               </span>
             </h1>
             <motion.p
-              className="mt-8 max-w-md text-balance text-sm leading-relaxed text-ivory/70 sm:text-base"
+              className="relative mt-8 max-w-md text-balance text-sm leading-relaxed text-ivory/90 [text-shadow:0_1px_3px_rgba(3,5,11,0.95),0_2px_18px_rgba(3,5,11,0.9)] sm:text-base"
               initial={{ opacity: 0, y: 24 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: DUR.base, ease: EASE, delay: 1.3 }}
