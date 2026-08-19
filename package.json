@@ -6,6 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "icons": "node scripts/generate-icon.mjs",
     "lint": "eslint"
   },
   "dependencies": {
