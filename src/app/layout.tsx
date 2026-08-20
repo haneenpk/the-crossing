@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { IBM_Plex_Mono, Instrument_Serif, Inter } from "next/font/google";
 import SmoothScroll from "@/components/providers/SmoothScroll";
+import Curtain from "@/components/ui/Curtain";
 import "./globals.css";
 
 const inter = Inter({
@@ -54,6 +55,11 @@ export default function RootLayout({
       className={`${inter.variable} ${instrument.variable} ${plexMono.variable} h-full antialiased`}
     >
       <body className="min-h-full">
+        {/* Only script can lift the curtain, so without script there is none. */}
+        <noscript>
+          <style>{`.curtain{display:none}`}</style>
+        </noscript>
+        <Curtain />
         <SmoothScroll>{children}</SmoothScroll>
       </body>
     </html>

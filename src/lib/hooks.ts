@@ -3,6 +3,7 @@
 import {
   useCallback,
   useEffect,
+  useState,
   useSyncExternalStore,
   type RefObject,
 } from "react";
@@ -56,4 +57,65 @@ export function useTouchVideoUnlock(ref: RefObject<HTMLVideoElement | null>) {
     window.addEventListener("touchstart", unlock, { once: true, passive: true });
     return () => window.removeEventListener("touchstart", unlock);
   }, [ref]);
+}
+
+/**
+ * True once the element is within `margin` of the viewport, and stays true.
+ *
+ * The films below the fold are several megabytes each. Fetching them at
+ * mount starves the one film the visitor is actually looking at, so they
+ * wait until the scroll is nearly on them — with enough margin that the
+ * first frame is decoded before it's seen.
+ */
+export function useNearViewport(
+  ref: RefObject<Element | null>,
+  margin = "100% 0px",
+): boolean {
+  const [near, setNear] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || near) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) setNear(true);
+      },
+      { rootMargin: margin },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [ref, margin, near]);
+
+  return near;
+}
+
+type ThinConnection = {
+  saveData?: boolean;
+  effectiveType?: string;
+  addEventListener?: (type: "change", fn: () => void) => void;
+  removeEventListener?: (type: "change", fn: () => void) => void;
+};
+
+const connection = (): ThinConnection | undefined =>
+  (navigator as Navigator & { connection?: ThinConnection }).connection;
+
+/**
+ * True when the visitor has asked for less data or is on a slow radio.
+ * Chromium-only, so an absent API means "assume a fat pipe" — the same
+ * assumption we made before the API existed.
+ */
+export function useThinConnection(): boolean {
+  return useSyncExternalStore(
+    (onChange) => {
+      const c = connection();
+      c?.addEventListener?.("change", onChange);
+      return () => c?.removeEventListener?.("change", onChange);
+    },
+    () => {
+      const c = connection();
+      if (!c) return false;
+      return Boolean(c.saveData) || /(^|-)([23]g|slow-2g)$/.test(c.effectiveType ?? "");
+    },
+    () => false,
+  );
 }

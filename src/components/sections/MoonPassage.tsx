@@ -8,7 +8,12 @@ import {
   useScroll,
   useTransform,
 } from "framer-motion";
-import { useMediaQuery, useMounted, useTouchVideoUnlock } from "@/lib/hooks";
+import {
+  useMediaQuery,
+  useMounted,
+  useNearViewport,
+  useTouchVideoUnlock,
+} from "@/lib/hooks";
 
 /** The dawn completes over this fraction of the passage; beyond it the
  *  lit Moon simply holds. Scrolling back rewinds the sunrise. */
@@ -29,6 +34,9 @@ export default function MoonPassage({ children }: { children: ReactNode }) {
 
   const mounted = useMounted();
   const reduced = useMediaQuery("(prefers-reduced-motion: reduce)");
+  // Hold the download until the scroll is a viewport away: fetching it at
+  // mount starves the hero, which is the film actually on screen.
+  const near = useNearViewport(wrapRef, "100% 0px");
   useTouchVideoUnlock(videoRef);
 
   const { scrollYProgress } = useScroll({
@@ -55,25 +63,26 @@ export default function MoonPassage({ children }: { children: ReactNode }) {
     <div ref={wrapRef} className="relative">
       {/* Sticky scenery under the scrolling story */}
       <div aria-hidden className="sticky top-0 h-svh overflow-hidden">
-        {reduced ? (
-          <Image
-            src="/media/moonrise-poster.jpg"
-            alt=""
-            fill
-            sizes="100vw"
-            className="object-cover brightness-[0.85]"
+        {/* The still sits under the film at all times: the passage is two
+            hundred viewport-heights below the front door, so it may still
+            be arriving when the scroll gets here, and a held frame reads
+            far better than a black rectangle. */}
+        <Image
+          src="/media/moonrise-poster.jpg"
+          alt=""
+          fill
+          sizes="100vw"
+          className="object-cover brightness-[0.85]"
+        />
+        {!reduced && mounted && near && (
+          <video
+            ref={videoRef}
+            src="/media/moonrise.mp4"
+            muted
+            playsInline
+            preload="auto"
+            className="absolute inset-0 h-full w-full object-cover brightness-[0.85]"
           />
-        ) : (
-          mounted && (
-            <video
-              ref={videoRef}
-              src="/media/moonrise.mp4"
-              muted
-              playsInline
-              preload="auto"
-              className="absolute inset-0 h-full w-full object-cover brightness-[0.85]"
-            />
-          )
         )}
 
         {/* Editorial shade on the reading side; the Moon stays clean on the right. */}

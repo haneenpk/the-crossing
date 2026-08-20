@@ -8,7 +8,12 @@ import RevealLines from "@/components/ui/RevealLines";
 import StatCounter from "@/components/ui/StatCounter";
 import CubeField from "@/components/ui/CubeField";
 import { DUR, EASE, fade } from "@/lib/motion";
-import { useMediaQuery, useMounted, useTouchVideoUnlock } from "@/lib/hooks";
+import {
+  useMediaQuery,
+  useMounted,
+  useNearViewport,
+  useTouchVideoUnlock,
+} from "@/lib/hooks";
 
 /**
  * The silver-fabric film, presented as a framed gallery object.
@@ -23,6 +28,8 @@ function FabricPanel() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const mounted = useMounted();
   const reduced = useMediaQuery("(prefers-reduced-motion: reduce)");
+  // 6.6 MB, seven scenes down the page — it waits its turn.
+  const near = useNearViewport(ref, "150% 0px");
   useTouchVideoUnlock(videoRef);
 
   const { scrollYProgress } = useScroll({
@@ -45,7 +52,7 @@ function FabricPanel() {
       {...fade(0.15)}
       className="relative aspect-1920/1000 overflow-hidden rounded-2xl shadow-[0_40px_80px_-24px_rgba(0,0,0,0.8)]"
     >
-      {reduced || !mounted ? (
+      {reduced || !mounted || !near ? (
         <Image
           src="/media/fabric-poster.jpg"
           alt="A slow wave of liquid silver fabric — an abstraction of the invisible structure of the universe"

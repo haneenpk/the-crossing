@@ -26,6 +26,23 @@
 html {
   background: var(--void);
   scrollbar-color: rgba(138, 148, 166, 0.35) transparent;
+  /* Reserve the scrollbar always, so locking the page during boot
+     doesn't shift the frame when the curtain lifts. */
+  scrollbar-gutter: stable;
+}
+
+/* The hero film is scrubbed by scroll, so scrolling before it has arrived
+   reads as a dead page. Hold everything still until the curtain lifts. */
+html.is-booting,
+html.is-booting body {
+  overflow: hidden;
+}
+
+/* Stills need no projector, so reduced motion never waits behind it. */
+@media (prefers-reduced-motion: reduce) {
+  .curtain {
+    display: none;
+  }
 }
 
 body {

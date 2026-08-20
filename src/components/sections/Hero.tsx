@@ -6,7 +6,13 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { motion } from "framer-motion";
 import { DUR, EASE } from "@/lib/motion";
-import { useMediaQuery, useMounted, useTouchVideoUnlock } from "@/lib/hooks";
+import {
+  useMediaQuery,
+  useMounted,
+  useThinConnection,
+  useTouchVideoUnlock,
+} from "@/lib/hooks";
+import { openCurtain, reportFilm } from "@/lib/boot";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
@@ -32,8 +38,42 @@ export default function Hero() {
   const mounted = useMounted();
   const reduced = useMediaQuery("(prefers-reduced-motion: reduce)");
   const isMobile = useMediaQuery("(max-width: 768px)");
-  const src = isMobile ? "/media/hero-1280.mp4" : "/media/hero-1920.mp4";
+  // The 1920 master is 14.7 MB for eight seconds. Nobody on a thin line
+  // should wait through that to reach the front door — hand them the 1280
+  // cut, which is the same shot at a third of the weight.
+  const thin = useThinConnection();
+  const src = isMobile || thin ? "/media/hero-1280.mp4" : "/media/hero-1920.mp4";
   useTouchVideoUnlock(videoRef);
+
+  // Tell the curtain how much film is in hand. Downloads land in order, so
+  // the end of the last buffered range is how far the scroll can travel
+  // before it outruns the decoder.
+  useEffect(() => {
+    const video = videoRef.current;
+    if (reduced || !mounted || !video) return;
+
+    const report = () => {
+      const { buffered, duration } = video;
+      if (!duration || Number.isNaN(duration)) return;
+      const held = buffered.length ? buffered.end(buffered.length - 1) : 0;
+      reportFilm(held / duration);
+    };
+    const enough = () => reportFilm(1);
+
+    video.addEventListener("progress", report);
+    video.addEventListener("loadeddata", report);
+    video.addEventListener("canplaythrough", enough);
+    // A film that never arrives must not hold the door shut.
+    video.addEventListener("error", openCurtain);
+    report();
+
+    return () => {
+      video.removeEventListener("progress", report);
+      video.removeEventListener("loadeddata", report);
+      video.removeEventListener("canplaythrough", enough);
+      video.removeEventListener("error", openCurtain);
+    };
+  }, [reduced, mounted, src]);
 
   useEffect(() => {
     if (reduced || !mounted) return;
